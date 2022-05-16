@@ -29,6 +29,12 @@ public class DashAbility : Ability
         // Actual dash
         if (spendResource())
         {
+            SoundManager.instance.PlaySoundOnPlayer(castSound);
+            if (castAnimation != null)
+            {
+                AnimationsManager.instance.PlaySkillAnim(Caster, "SkillsAnimBaseLayer", castAnimation, 1, loopCastAnim);
+            }
+
             Vector3 clickPos = SpellsManager.getMouseWorldPos();
             targetPos = new Vector3(clickPos.x, Caster.transform.position.y, clickPos.z);
             Vector3 dir = targetPos - Caster.transform.position;
@@ -38,12 +44,15 @@ public class DashAbility : Ability
             else if (dir.magnitude < minDistance)
                 targetPos = Caster.transform.position + dir.normalized * minDistance;
 
-            // We can jump
+            Caster.StopMoving();
+            // We can dash
             if (teleport)
-            {
                 Caster.transform.position = targetPos;
+            else
+            {
+                Caster.BlockMovement();
+                SpellsManager.instance.SubscribeFunction(MoveTo);
             }
-            else SpellsManager.instance.SubscribeFunction(MoveTo);
         }
     }
 
@@ -55,6 +64,8 @@ public class DashAbility : Ability
         {
             SpellsManager.instance.UnSubscribeFunction(MoveTo);
             rig.velocity = Vector3.zero;
+            Caster.UnBlockMovement();
+            AnimationsManager.instance.StopLoopAnim(Caster);
             return;
         }
         rig.velocity = distance.normalized * dashSpeed;

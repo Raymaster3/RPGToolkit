@@ -13,10 +13,13 @@ public class CharacterData : ScriptableObject
     [SerializeField] private Ability[] abilities;
     [SerializeField] private Faction faction;
     [SerializeField] private Effect[] permanentEffects;
+    [SerializeField] private Inventory defaultInventory;
+    [SerializeField] public AnimationClip hitAnim;
 
     public Faction Faction { get => faction; }
     public Ability[] Abilities { get => abilities; }
     public Effect[] PermanentEffects { get => permanentEffects; }
+    public Inventory Inventory { get => defaultInventory; }
 
     public StatValue getStatByIndex(int pos) { return stats[pos]; }
     public StatValue getStatByName(string name) { 

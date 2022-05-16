@@ -11,21 +11,19 @@ public class SquareAOE : AOESpell
     [SerializeField] private bool pivotCentered;
     [SerializeField] private float xPos, zPos;
 
-    public override void OnSecondCast()
+    protected override void NextCast()
     {
-        base.OnSecondCast();
-
+        base.NextCast();
         if (debug)
         {
-            //SpellsManager.instance.setUpGizmosCube(SpellsManager.getMouseWorldPos(), new Vector3(xSize, xSize, zSize));
-            //SpellsManager.instance.resetGizmos();
+            SpellsManager.instance.resetGizmos();
+            SpellsManager.instance.setUpGizmosCube(Point /*+ new Vector3(xSize/2, 0, zSize/2)*/, new Vector3(xSize, 0, zSize));
         }
-
-        /*foreach(EffectValue e in Effects)
-        {
-            e.Initialize();
-            e.Effect.OnApply(SpellsManager.instance.target);
-        }*/
+    }
+    protected override void resizeVisual(GameObject go)
+    {
+        float radius = Mathf.Sqrt(xSize*xSize + zSize*zSize);
+        SpellsManager.ResizeGameObject(go, 0, false, xSize, zSize);
     }
     public override void BehaviourAfterDelay(Vector3 m_point)
     {

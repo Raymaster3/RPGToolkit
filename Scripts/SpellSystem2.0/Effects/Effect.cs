@@ -13,6 +13,8 @@ public class Effect : ScriptableObject
     [SerializeField] private StatValueEffect[] statsToModify;
     //[SerializeField] private Stat statToModify;
     [SerializeField] private bool permanent;
+    [SerializeField] protected EffectType natureOfEffect;
+    [SerializeField] protected GameObject effectPrefab;
 
     // Private variables
     private Operation operation;                     // Filled by the ability
@@ -31,11 +33,20 @@ public class Effect : ScriptableObject
     public float Value { get => value; }
 
 
+    public bool checkIfValid(Character caster, Character target)
+    {
+        if (natureOfEffect == EffectType.Positive)
+            return caster.Faction.getRealtionStatus(target.Faction) == RelationType.Friendly;
+        else
+            return caster.Faction.getRealtionStatus(target.Faction) != RelationType.Friendly;
+    }
+
     public virtual void OnApply(Character trgt) {   // Called once when the effect is applied to a character
         target = trgt;
         Effect eff = Instantiate(this);             // Copy the effect for the player
         eff.Target = target;
         target.addEffect(eff);
+        if (effectPrefab != null) target.addVisualEffect(effectPrefab, duration);
         eff.OnStartEffecting();                     // We call the functions on the copy we created 
     }
     public virtual void OnStartEffecting() {        // Called once when the effect starts effecting
@@ -46,7 +57,7 @@ public class Effect : ScriptableObject
         }
     }
     public virtual void WhileEffecting() {          // Called every frame while the effect is applied
-        if (permanent) return; // If permanent we dont want to end the timer
+        if (permanent) return;                      // If permanent we dont want to end the timer
 
         // Timer
         timer += Time.deltaTime;
@@ -74,4 +85,9 @@ public class StatValueEffect
     {
         return value;
     }
+}
+public enum EffectType
+{
+    Positive,
+    Negative
 }
